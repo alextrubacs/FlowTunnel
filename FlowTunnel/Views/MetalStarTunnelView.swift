@@ -44,6 +44,11 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
     private let vertexBuffer: MTLBuffer          // Fullscreen quad vertices
     private var startTime: CFAbsoluteTime        // When rendering started
 
+    // FPS tracking
+    private var frameCount: Int = 0
+    private var lastFPSUpdate: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
+    var currentFPS: Double = 0.0
+
     // Animatable parameters synced from SwiftUI
     var speed: Float = 1.0
     var stretch: Float = 0.5
@@ -126,6 +131,16 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
         // Calculate elapsed time for animation
         let elapsed = Float(CFAbsoluteTimeGetCurrent() - startTime)
 
+        // Update FPS counter
+        frameCount += 1
+        let currentTime = CFAbsoluteTimeGetCurrent()
+        let timeSinceLastUpdate = currentTime - lastFPSUpdate
+        if timeSinceLastUpdate >= 0.5 {  // Update FPS every 0.5 seconds
+            currentFPS = Double(frameCount) / timeSinceLastUpdate
+            frameCount = 0
+            lastFPSUpdate = currentTime
+        }
+
         // Package all shader parameters into a single buffer
         var uniforms = StarUniforms(
             time: elapsed,                  // How far through animation we are
@@ -169,9 +184,10 @@ struct StarTunnelView: UIViewRepresentable {
     var size: Float
     var blackHoleRadius: Float
     var blackHoleWarp: Float
+    @Binding var fps: Double
 
     func makeCoordinator() -> Coordinator {
-        Coordinator()
+        Coordinator(fps: $fps)
     }
 
     func makeUIView(context: Context) -> MTKView {
@@ -179,7 +195,7 @@ struct StarTunnelView: UIViewRepresentable {
         mtkView.device = MTLCreateSystemDefaultDevice()
         mtkView.colorPixelFormat = .bgra8Unorm
         mtkView.clearColor = MTLClearColorMake(0, 0, 0, 1)
-        mtkView.preferredFramesPerSecond = 60
+        mtkView.preferredFramesPerSecond = 120
         mtkView.enableSetNeedsDisplay = false
         mtkView.isPaused = false
 
@@ -193,6 +209,7 @@ struct StarTunnelView: UIViewRepresentable {
             renderer.blackHoleWarp = blackHoleWarp
             mtkView.delegate = renderer
             context.coordinator.renderer = renderer
+            context.coordinator.startFPSUpdates()
         }
 
         return mtkView
@@ -208,7 +225,24 @@ struct StarTunnelView: UIViewRepresentable {
         context.coordinator.renderer?.blackHoleWarp = blackHoleWarp
     }
 
-    class Coordinator {
+    class Coordinator: @unchecked Sendable {
         var renderer: MetalStarTunnelRenderer?
+        var fps: Binding<Double>
+
+        init(fps: Binding<Double>) {
+            self.fps = fps
+        }
+
+        func startFPSUpdates() {
+            // Poll FPS from the main actor on a timer
+            Task { @MainActor in
+                while !Task.isCancelled {
+                    if let renderer = self.renderer {
+                        self.fps.wrappedValue = renderer.currentFPS
+                    }
+                    try? await Task.sleep(for: .milliseconds(100))
+                }
+            }
+        }
     }
 }
