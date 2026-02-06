@@ -65,49 +65,43 @@ fragment float4 starTunnelFragment(VertexOut in [[stage_in]],
         float fade = depth * smoothstep(0.0, 0.1, depth) * smoothstep(1.0, 0.8, depth);
 
         float2 gridUV = uv * scale;
-        float2 baseCell = floor(gridUV);
+        float2 cellID = floor(gridUV);
+        
+        float rnd = hash21(cellID + float(i) * 134.51);
 
-        // Sample 3x3 neighborhood to eliminate cell-boundary clipping
-        for (int ox = -1; ox <= 1; ox++) {
-            for (int oy = -1; oy <= 1; oy++) {
-                float2 cellID = baseCell + float2(float(ox), float(oy));
-                float rnd = hash21(cellID + float(i) * 134.51);
+        if (rnd >= threshold) {
+            // Star position within cell
+            float2 starPos = float2(hash21(cellID * 1.1 + float(i) * 73.0),
+                                     hash21(cellID * 2.3 + float(i) * 91.0)) - 0.5;
+            starPos *= 0.8;
 
-                if (rnd < threshold) continue;
+            // Delta from this fragment to the star center (in grid space)
+            float2 delta = gridUV - (cellID + 0.5 + starPos);
 
-                // Star position within cell
-                float2 starPos = float2(hash21(cellID * 1.1 + float(i) * 73.0),
-                                         hash21(cellID * 2.3 + float(i) * 91.0)) - 0.5;
-                starPos *= 0.8;
-
-                // Delta from this fragment to the star center (in grid space)
-                float2 delta = gridUV - (cellID + 0.5 + starPos);
-
-                float dist;
-                if (uniforms.stretch > 0.0) {
-                    // Radial stretch from screen center
-                    float2 worldPos = (cellID + 0.5 + starPos) / scale;
-                    float radLen = length(worldPos);
-                    float2 radialDir = radLen > 1e-5 ? worldPos / radLen : float2(0.0, 1.0);
-                    float radialComponent = dot(delta, radialDir);
-                    float2 tangent = delta - radialComponent * radialDir;
-                    float tangentLen = length(tangent);
-                    float stretchFactor = 1.0 + uniforms.stretch * depth * 3.0;
-                    dist = sqrt(tangentLen * tangentLen +
-                                (radialComponent / stretchFactor) * (radialComponent / stretchFactor));
-                } else {
-                    dist = length(delta);
-                }
-
-                // Smooth falloff: Gaussian-ish glow centered on baseRadius
-                float brightness = exp(-dist * dist / (baseRadius * baseRadius * glowWidth));
-                brightness *= fade;
-
-                float3 starColor = mix(float3(0.8, 0.85, 1.0),
-                                        float3(0.6, 0.7, 1.0),
-                                        hash21(cellID + 42.0));
-                col += starColor * brightness;
+            float dist;
+            if (uniforms.stretch > 0.0) {
+                // Radial stretch from screen center
+                float2 worldPos = (cellID + 0.5 + starPos) / scale;
+                float radLen = length(worldPos);
+                float2 radialDir = radLen > 1e-5 ? worldPos / radLen : float2(0.0, 1.0);
+                float radialComponent = dot(delta, radialDir);
+                float2 tangent = delta - radialComponent * radialDir;
+                float tangentLen = length(tangent);
+                float stretchFactor = 1.0 + uniforms.stretch * depth * 3.0;
+                dist = sqrt(tangentLen * tangentLen +
+                            (radialComponent / stretchFactor) * (radialComponent / stretchFactor));
+            } else {
+                dist = length(delta);
             }
+
+            // Smooth falloff: Gaussian-ish glow centered on baseRadius
+            float brightness = exp(-dist * dist / (baseRadius * baseRadius * glowWidth));
+            brightness *= fade;
+
+            float3 starColor = mix(float3(0.8, 0.85, 1.0),
+                                    float3(0.6, 0.7, 1.0),
+                                    hash21(cellID + 42.0));
+            col += starColor * brightness;
         }
     }
 
