@@ -9,15 +9,16 @@ struct ContentView: View {
     @State private var blackHoleRadius: Float = 0.15
     @State private var blackHoleWarp: Float = 1.0
     @State private var showControls = false
+    @State private var fps: Double = 0.0
 
     var body: some View {
         ZStack {
-            StarTunnelView(speed: speed, stretch: stretch, blur: blur, density: density, size: size, blackHoleRadius: blackHoleRadius, blackHoleWarp: blackHoleWarp)
+            StarTunnelView(speed: speed, stretch: stretch, blur: blur, density: density,
+                          size: size, blackHoleRadius: blackHoleRadius, blackHoleWarp: blackHoleWarp, fps: $fps)
                 .ignoresSafeArea()
 
             VStack {
                 Spacer()
-
                 if showControls {
                     controlsPanel
                         .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -25,9 +26,16 @@ struct ContentView: View {
             }
             .animation(.easeInOut(duration: 0.3), value: showControls)
 
-            // Toggle button
             VStack {
                 HStack {
+                    // FPS counter
+                    Text(String(format: "%.0f FPS", fps))
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.white)
+                        .bold()
+                        .padding(8)
+                        .glassEffect(.clear, in: .capsule)
+
                     Spacer()
                     Button {
                         withAnimation(.spring) {
@@ -38,6 +46,8 @@ struct ContentView: View {
                     }
                     .buttonStyle(.glass)
                 }
+                .padding(.horizontal)
+                .padding(.top, 8)
                 Spacer()
             }
         }
@@ -61,6 +71,11 @@ struct ContentView: View {
         .padding(.bottom, 16)
     }
 
+    /// Parameter slider with label and current value display
+    /// - Parameters:
+    ///   - label: Display name for the parameter
+    ///   - value: Binding to the parameter Float value
+    ///   - range: Valid range for the slider
     private func parameterSlider(label: String, value: Binding<Float>, range: ClosedRange<Float>) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
