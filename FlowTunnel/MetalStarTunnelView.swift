@@ -3,13 +3,14 @@ import MetalKit
 
 struct StarUniforms {
     var time: Float = 0
-    var speed: Float = 1.0
-    var stretch: Float = 0.5
+    var speed: Float = 1.5
+    var stretch: Float = 0.07
     var blur: Float = 0.3
     var density: Float = 0.5
-    var size: Float = 1.0
+    var size: Float = 0.15
     var resolution: SIMD2<Float> = .zero
     var blackHoleRadius: Float = 0.15
+    var _padding: Float = 0  // Metal struct alignment padding
 }
 
 class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
