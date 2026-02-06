@@ -193,11 +193,17 @@ struct StarTunnelView: UIViewRepresentable {
     func makeUIView(context: Context) -> MTKView {
         let mtkView = MTKView()
         mtkView.device = MTLCreateSystemDefaultDevice()
-        mtkView.colorPixelFormat = .bgra8Unorm
+        mtkView.colorPixelFormat = .rgba16Float
         mtkView.clearColor = MTLClearColorMake(0, 0, 0, 1)
         mtkView.preferredFramesPerSecond = 120
         mtkView.enableSetNeedsDisplay = false
         mtkView.isPaused = false
+
+        // Enable EDR/HDR — allows shader output > 1.0 to display brighter than SDR white
+        if let metalLayer = mtkView.layer as? CAMetalLayer {
+            metalLayer.wantsExtendedDynamicRangeContent = true
+            metalLayer.colorspace = CGColorSpace(name: CGColorSpace.extendedLinearSRGB)
+        }
 
         if let renderer = MetalStarTunnelRenderer(mtkView: mtkView) {
             renderer.speed = speed
