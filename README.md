@@ -321,7 +321,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-[Your License Here]
+FlowTunnelKit is available under the MIT License. See the [LICENSE](LICENSE) file for more info.
+
+```
+Copyright (c) 2026 Alex Trubacs
+```
 
 ## Acknowledgments
 
