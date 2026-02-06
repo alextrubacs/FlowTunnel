@@ -2,16 +2,17 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var speed: Float = 1.0
-    @State private var stretch: Float = 0.5
-    @State private var blur: Float = 0.3
-    @State private var density: Float = 0.5
-    @State private var size: Float = 1.0
+    @State private var stretch: Float = 0.0
+    @State private var blur: Float = 0.15
+    @State private var density: Float = 1.8
+    @State private var size: Float = 0.15
     @State private var blackHoleRadius: Float = 0.15
-    @State private var showControls = true
+    @State private var blackHoleWarp: Float = 1.0
+    @State private var showControls = false
 
     var body: some View {
         ZStack {
-            StarTunnelView(speed: speed, stretch: stretch, blur: blur, density: density, size: size, blackHoleRadius: blackHoleRadius)
+            StarTunnelView(speed: speed, stretch: stretch, blur: blur, density: density, size: size, blackHoleRadius: blackHoleRadius, blackHoleWarp: blackHoleWarp)
                 .ignoresSafeArea()
 
             VStack {
@@ -29,13 +30,13 @@ struct ContentView: View {
                 HStack {
                     Spacer()
                     Button {
-                        showControls.toggle()
+                        withAnimation(.spring) {
+                            showControls.toggle()
+                        }
                     } label: {
-                        Image(systemName: showControls ? "chevron.down.circle.fill" : "slider.horizontal.3")
-                            .font(.title2)
-                            .foregroundStyle(.white.opacity(0.7))
-                            .padding(12)
+                        Text(showControls ? "close" : "controls")
                     }
+                    .buttonStyle(.glass)
                 }
                 Spacer()
             }
@@ -49,13 +50,13 @@ struct ContentView: View {
             parameterSlider(label: "Speed", value: $speed, range: 0...3)
             parameterSlider(label: "Stretch", value: $stretch, range: 0...3)
             parameterSlider(label: "Blur", value: $blur, range: 0...1)
-            parameterSlider(label: "Density", value: $density, range: 0.1...1)
+            parameterSlider(label: "Density", value: $density, range: 0.1...2)
             parameterSlider(label: "Size", value: $size, range: 0.1...3)
             parameterSlider(label: "Black Hole", value: $blackHoleRadius, range: 0...0.5)
+            parameterSlider(label: "BH Warp", value: $blackHoleWarp, range: 0...3)
         }
         .padding(20)
-        .background(.ultraThinMaterial.opacity(0.8))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.clear, in: .rect(cornerRadius: 38))
         .padding(.horizontal, 16)
         .padding(.bottom, 16)
     }
@@ -65,14 +66,15 @@ struct ContentView: View {
             HStack {
                 Text(label)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(.white)
                 Spacer()
                 Text(String(format: "%.2f", value.wrappedValue))
                     .font(.caption.monospacedDigit())
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.white)
+                    .bold()
             }
             Slider(value: value, in: range)
-                .tint(.white.opacity(0.6))
+                .tint(.cyan)
         }
     }
 }

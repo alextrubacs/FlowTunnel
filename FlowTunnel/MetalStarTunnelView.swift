@@ -10,7 +10,7 @@ struct StarUniforms {
     var size: Float = 0.15
     var resolution: SIMD2<Float> = .zero
     var blackHoleRadius: Float = 0.15
-    var _padding: Float = 0  // Metal struct alignment padding
+    var blackHoleWarp: Float = 1.0
 }
 
 class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
@@ -26,6 +26,7 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
     var density: Float = 0.5
     var size: Float = 1.0
     var blackHoleRadius: Float = 0.15
+    var blackHoleWarp: Float = 1.0
 
     init?(mtkView: MTKView) {
         guard let device = mtkView.device ?? MTLCreateSystemDefaultDevice(),
@@ -91,7 +92,8 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
             size: size,
             resolution: SIMD2<Float>(Float(view.drawableSize.width),
                                      Float(view.drawableSize.height)),
-            blackHoleRadius: blackHoleRadius
+            blackHoleRadius: blackHoleRadius,
+            blackHoleWarp: blackHoleWarp
         )
 
         encoder.setRenderPipelineState(pipelineState)
@@ -112,6 +114,7 @@ struct StarTunnelView: UIViewRepresentable {
     var density: Float
     var size: Float
     var blackHoleRadius: Float
+    var blackHoleWarp: Float
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -133,6 +136,7 @@ struct StarTunnelView: UIViewRepresentable {
             renderer.density = density
             renderer.size = size
             renderer.blackHoleRadius = blackHoleRadius
+            renderer.blackHoleWarp = blackHoleWarp
             mtkView.delegate = renderer
             context.coordinator.renderer = renderer
         }
@@ -147,6 +151,7 @@ struct StarTunnelView: UIViewRepresentable {
         context.coordinator.renderer?.density = density
         context.coordinator.renderer?.size = size
         context.coordinator.renderer?.blackHoleRadius = blackHoleRadius
+        context.coordinator.renderer?.blackHoleWarp = blackHoleWarp
     }
 
     class Coordinator {
