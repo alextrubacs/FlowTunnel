@@ -200,7 +200,9 @@ struct ContentView: View {
             warpProgress = max(0.0, warpProgress - dt / rampDownDuration)
         }
 
-        let eased = easedWarpProgress(warpProgress)
+        let eased = isWarpPressed
+            ? easedRampUp(warpProgress)
+            : easedRampDown(warpProgress)
 
         // Interpolate shader parameters
         speed = lerp(preWarpSpeed, warpTargetSpeed, eased)
@@ -212,10 +214,16 @@ struct ContentView: View {
         updateHaptics(easedProgress: eased)
     }
 
-    /// Hermite smoothstep: 3t^2 - 2t^3
-    private func easedWarpProgress(_ t: Float) -> Float {
-        let clamped = min(max(t, 0), 1)
-        return clamped * clamped * (3 - 2 * clamped)
+    /// Ramp up: smoothstep for gradual acceleration feel
+    private func easedRampUp(_ t: Float) -> Float {
+        let c = min(max(t, 0), 1)
+        return c * c * (3 - 2 * c)
+    }
+
+    /// Ramp down: quadratic ease-in so deceleration starts immediately (no plateau)
+    private func easedRampDown(_ t: Float) -> Float {
+        let c = min(max(t, 0), 1)
+        return c * c
     }
 
     private func lerp(_ a: Float, _ b: Float, _ t: Float) -> Float {
