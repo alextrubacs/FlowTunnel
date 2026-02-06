@@ -45,7 +45,8 @@
 -->
 
 <p align="center">
-  <strong>📹 [Add your demo GIF/video here]</strong>
+  <strong>![Simulator Screen Recording - iPhone 17 Pro - 2026-02-06 at 22 31 45](https://github.com/user-attachments/assets/b7411caa-faf5-41e4-b88f-6f1e5c4678f2)
+</strong>
 </p>
 
 ---
