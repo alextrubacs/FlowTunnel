@@ -209,8 +209,9 @@ struct StarTunnelView: UIViewRepresentable {
             metalLayer.colorspace = CGColorSpace(name: CGColorSpace.extendedLinearSRGB)
             // Check if EDR is actually supported (requires iOS 16+ and compatible display)
             if #available(iOS 16.0, *) {
-                edrEnabled = metalLayer.wantsExtendedDynamicRangeContent && 
-                             UIScreen.main.currentEDRHeadroom > 1.0
+                // Defer EDR headroom check until view is in window hierarchy
+                // We'll enable the capability now and check actual headroom in updateUIView if needed
+                edrEnabled = metalLayer.wantsExtendedDynamicRangeContent
             }
         }
 
