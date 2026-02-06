@@ -10,6 +10,7 @@ struct StarUniforms {
     float size;
     float2 resolution;
     float blackHoleRadius;
+    float blackHoleWarp;
 };
 
 struct VertexOut {
@@ -44,7 +45,8 @@ fragment float4 starTunnelFragment(VertexOut in [[stage_in]],
     if (bhR > 0.0) {
         float r = length(uv);
         // Schwarzschild-inspired lensing: displacement ~ R²/r²
-        float deflection = (bhR * bhR) / (r * r + 0.001);
+        // blackHoleWarp scales the deflection strength
+        float deflection = uniforms.blackHoleWarp * (bhR * bhR) / (r * r + 0.001);
         uv = uv * (1.0 + deflection);
     }
 
