@@ -1,3 +1,0 @@
-module FlowTunnelKit {
-    header "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/include/FlowTunnelKit-Swift.h"
-}
