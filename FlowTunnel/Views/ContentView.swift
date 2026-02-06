@@ -12,12 +12,12 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            StarTunnelView(speed: speed, stretch: stretch, blur: blur, density: density, size: size, blackHoleRadius: blackHoleRadius, blackHoleWarp: blackHoleWarp)
+            StarTunnelView(speed: speed, stretch: stretch, blur: blur, density: density,
+                          size: size, blackHoleRadius: blackHoleRadius, blackHoleWarp: blackHoleWarp)
                 .ignoresSafeArea()
 
             VStack {
                 Spacer()
-
                 if showControls {
                     controlsPanel
                         .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -25,7 +25,6 @@ struct ContentView: View {
             }
             .animation(.easeInOut(duration: 0.3), value: showControls)
 
-            // Toggle button
             VStack {
                 HStack {
                     Spacer()
@@ -61,6 +60,11 @@ struct ContentView: View {
         .padding(.bottom, 16)
     }
 
+    /// Parameter slider with label and current value display
+    /// - Parameters:
+    ///   - label: Display name for the parameter
+    ///   - value: Binding to the parameter Float value
+    ///   - range: Valid range for the slider
     private func parameterSlider(label: String, value: Binding<Float>, range: ClosedRange<Float>) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {

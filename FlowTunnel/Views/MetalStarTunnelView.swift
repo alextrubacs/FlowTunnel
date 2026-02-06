@@ -1,6 +1,8 @@
 import SwiftUI
 import MetalKit
 
+/// Uniform parameter struct mirroring the Metal shader struct
+/// IMPORTANT: Field order and types must exactly match StarUniforms in StarTunnel.metal
 struct StarUniforms {
     var time: Float = 0
     var speed: Float = 1.5
@@ -13,12 +15,13 @@ struct StarUniforms {
     var blackHoleWarp: Float = 1.0
 }
 
+/// Metal Renderer - Manages GPU rendering pipeline and frame updates
 class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
     private let device: MTLDevice
     private let commandQueue: MTLCommandQueue
     private let pipelineState: MTLRenderPipelineState
     private let vertexBuffer: MTLBuffer
-    private var startTime: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
+    private var startTime: CFAbsoluteTime
 
     var speed: Float = 1.0
     var stretch: Float = 0.5
@@ -28,6 +31,7 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
     var blackHoleRadius: Float = 0.15
     var blackHoleWarp: Float = 1.0
 
+    /// Initialize Metal device, compile shaders, and create render pipeline
     init?(mtkView: MTKView) {
         guard let device = mtkView.device ?? MTLCreateSystemDefaultDevice(),
               let commandQueue = device.makeCommandQueue() else {
@@ -36,9 +40,10 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
 
         self.device = device
         self.commandQueue = commandQueue
+        self.startTime = CFAbsoluteTimeGetCurrent()
         mtkView.device = device
 
-        // Fullscreen quad vertices (2 triangles)
+        // Fullscreen quad vertices
         let vertices: [SIMD2<Float>] = [
             SIMD2(-1, -1), SIMD2( 1, -1), SIMD2(-1,  1),
             SIMD2(-1,  1), SIMD2( 1, -1), SIMD2( 1,  1)
@@ -50,7 +55,7 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
         }
         self.vertexBuffer = vb
 
-        // Build render pipeline
+        // Load and compile Metal shaders
         guard let library = device.makeDefaultLibrary(),
               let vertexFunc = library.makeFunction(name: "starTunnelVertex"),
               let fragFunc = library.makeFunction(name: "starTunnelFragment") else {
