@@ -1,9 +1,54 @@
+<!--
+  TODO: Add package icon/logo here
+  Recommended: Create a logo image (PNG) showing:
+  - Star tunnel visual or abstract representation
+  - Package name (optional)
+  - Dimensions: 400-800px wide recommended
+
+  Place your icon.png in the repository root, then uncomment:
+
+  <p align="center">
+    <img src="icon.png" alt="FlowTunnelKit" width="400">
+  </p>
+-->
+
+<p align="center">
+  <strong>🎨 [Add your package icon here]</strong>
+</p>
+
 # FlowTunnelKit
 
-A high-performance, multi-platform Swift package for rendering procedural star tunnel effects with gravitational lensing on iOS, macOS, and visionOS.
+<p align="center">
+  A high-performance, multi-platform Swift package for rendering procedural star tunnel effects with gravitational lensing on iOS, macOS, and visionOS.
+</p>
 
-![Demo](demo.gif)
-*Coming soon: Demo GIF*
+---
+
+<!--
+  TODO: Add demo GIF or video here
+  Recommended: Record a 5-10 second screen recording showing:
+  - Star tunnel effect in action
+  - Warp speed animation
+  - Parameter adjustments (optional)
+
+  Place your demo.gif or demo.mp4 in the repository root, then uncomment:
+
+  <p align="center">
+    <img src="demo.gif" alt="FlowTunnelKit Demo">
+  </p>
+
+  Or use a hosted image:
+
+  <p align="center">
+    <img src="https://github.com/yourusername/FlowTunnel/raw/main/demo.gif" alt="Demo">
+  </p>
+-->
+
+<p align="center">
+  <strong>📹 [Add your demo GIF/video here]</strong>
+</p>
+
+---
 
 ## Features
 
