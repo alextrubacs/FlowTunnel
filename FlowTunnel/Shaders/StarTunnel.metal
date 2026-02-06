@@ -145,13 +145,13 @@ fragment float4 starTunnelFragment(VertexOut in [[stage_in]],
             float3 starColor = mix(float3(1.0, 1.0, 1.0),   // Pure white
                                     float3(0.95, 0.95, 1.0), // Bright blue-white
                                     hash21(cellID + 42.0));  // Per-cell variation
-            col += starColor * brightness;             // Accumulate contribution
+            col += starColor * brightness * 1.5;       // Accumulate with brightness boost
         }
     }
 
     // ===== Tone Mapping - Compression to displayable range =====
     // Exponential compression: maps high intensity to visible color without blowout
-    col = 1.0 - exp(-col * 1.5);
+    col = 1.0 - exp(-col * 1.0);  // Reduced compression for brighter overall
 
     // ===== Black Hole Event Horizon =====
     if (bhR > 0.0) {
