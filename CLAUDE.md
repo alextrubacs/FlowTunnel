@@ -191,7 +191,8 @@ When making changes to the project:
 
 ## Build Settings
 - **Deployment Target**: iOS 26.2
-- **Swift Version**: 5.0
+- **Swift Version**: 6.0
+- **Swift Concurrency**: Strict (SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor)
 - **Metal Fast Math**: Enabled (MTL_FAST_MATH = YES)
 - **Team ID**: H2WYXEJN79
 - **Bundle ID**: com.alextrubacs.FlowTunnel
