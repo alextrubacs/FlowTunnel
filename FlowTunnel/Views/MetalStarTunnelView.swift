@@ -13,6 +13,7 @@ struct StarUniforms {
     var resolution: SIMD2<Float> = .zero
     var blackHoleRadius: Float = 0.15
     var blackHoleWarp: Float = 1.0
+    var enableEDR: Float = 0.0
 }
 
 /// Metal Renderer - GPU rendering engine for the star tunnel effect
@@ -57,6 +58,7 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
     var size: Float = 1.0
     var blackHoleRadius: Float = 0.15
     var blackHoleWarp: Float = 1.0
+    var isEDREnabled: Bool = false
 
     /// Initialize Metal device, compile shaders, and create render pipeline
     /// - Gets or creates a GPU device
@@ -152,7 +154,8 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
             resolution: SIMD2<Float>(Float(view.drawableSize.width),
                                      Float(view.drawableSize.height)),  // Screen size
             blackHoleRadius: blackHoleRadius,  // Size of black hole
-            blackHoleWarp: blackHoleWarp       // Strength of light bending
+            blackHoleWarp: blackHoleWarp,      // Strength of light bending
+            enableEDR: isEDREnabled ? 1.0 : 0.0  // Enable EDR boost on capable displays
         )
 
         // Tell GPU which compiled shader program to use
@@ -200,9 +203,15 @@ struct StarTunnelView: UIViewRepresentable {
         mtkView.isPaused = false
 
         // Enable EDR/HDR — allows shader output > 1.0 to display brighter than SDR white
+        var edrEnabled = false
         if let metalLayer = mtkView.layer as? CAMetalLayer {
             metalLayer.wantsExtendedDynamicRangeContent = true
             metalLayer.colorspace = CGColorSpace(name: CGColorSpace.extendedLinearSRGB)
+            // Check if EDR is actually supported (requires iOS 16+ and compatible display)
+            if #available(iOS 16.0, *) {
+                edrEnabled = metalLayer.wantsExtendedDynamicRangeContent && 
+                             UIScreen.main.currentEDRHeadroom > 1.0
+            }
         }
 
         if let renderer = MetalStarTunnelRenderer(mtkView: mtkView) {
@@ -213,6 +222,7 @@ struct StarTunnelView: UIViewRepresentable {
             renderer.size = size
             renderer.blackHoleRadius = blackHoleRadius
             renderer.blackHoleWarp = blackHoleWarp
+            renderer.isEDREnabled = edrEnabled
             mtkView.delegate = renderer
             context.coordinator.renderer = renderer
             context.coordinator.startFPSUpdates()
