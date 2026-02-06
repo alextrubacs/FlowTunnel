@@ -11,11 +11,19 @@ extension StarTunnelViewBridge {
         let mtkView = MTKView()
 
         guard let device = MTLCreateSystemDefaultDevice() else {
-            fatalError("Metal is not available on this device")
+            print("⚠️ Metal is not available (running in Simulator?). Showing black screen.")
+            return mtkView
         }
 
         mtkView.device = device
+
+        // Use rgba16Float on real devices, fallback to bgra8Unorm on simulator
+        #if targetEnvironment(simulator)
+        mtkView.colorPixelFormat = .bgra8Unorm
+        #else
         mtkView.colorPixelFormat = .rgba16Float
+        #endif
+
         mtkView.clearColor = MTLClearColorMake(0, 0, 0, 1)
         mtkView.preferredFramesPerSecond = 120
         mtkView.enableSetNeedsDisplay = false

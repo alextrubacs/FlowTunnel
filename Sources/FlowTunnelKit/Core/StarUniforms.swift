@@ -39,6 +39,10 @@ public struct StarUniforms: Sendable {
     /// 1.0 if EDR/HDR output is available, 0.0 for SDR displays.
     var enableEDR: Float
 
+    /// Padding to align struct to 16-byte boundary (Metal requirement).
+    /// Metal expects 48 bytes total (44 + 4 padding).
+    private var _padding: Float = 0.0
+
     /// Creates uniforms from configuration with runtime state.
     ///
     /// - Parameters:
