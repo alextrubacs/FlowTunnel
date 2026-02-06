@@ -13,7 +13,7 @@
 -->
 
 <p align="center">
-  <strong>🎨 [Add your package icon here]</strong>
+  <strong><img width="250" height="250" alt="flow-package-icon-iOS-Default-1024x1024@1x copy" src="https://github.com/user-attachments/assets/20271da7-111a-4465-b291-cf37e44cb0fe" /></strong>
 </p>
 
 # FlowTunnelKit
