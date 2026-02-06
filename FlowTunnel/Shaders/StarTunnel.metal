@@ -141,10 +141,10 @@ fragment float4 starTunnelFragment(VertexOut in [[stage_in]],
             float brightness = exp(-dist * dist / (baseRadius * baseRadius * glowWidth));
             brightness *= fade;                        // Modulate by depth fade
 
-            // ===== Star Color - Slight variation per cell =====
-            float3 starColor = mix(float3(0.8, 0.85, 1.0),   // Cool blue-white
-                                    float3(0.6, 0.7, 1.0),    // Cooler blue
-                                    hash21(cellID + 42.0));   // Per-cell variation
+            // ===== Star Color - Pure white with slight variation =====
+            float3 starColor = mix(float3(1.0, 1.0, 1.0),   // Pure white
+                                    float3(0.95, 0.95, 1.0), // Bright blue-white
+                                    hash21(cellID + 42.0));  // Per-cell variation
             col += starColor * brightness;             // Accumulate contribution
         }
     }
