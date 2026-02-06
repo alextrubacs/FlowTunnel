@@ -45,8 +45,12 @@
 -->
 
 <p align="center">
-  <strong>![Simulator Screen Recording - iPhone 17 Pro - 2026-02-06 at 22 31 45](https://github.com/user-attachments/assets/09278e03-34b4-4dd3-815e-771cb9b35e8b)
+  <strong><img src""/>
 </strong>
+</p>
+
+<p align="center">
+  <strong><img width="295" height="640" alt="flowing gif" src="https://github.com/user-attachments/assets/55a2190b-f5fe-471c-a7a4-30f3d3425f2a" /></strong>
 </p>
 
 ---
