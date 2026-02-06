@@ -149,9 +149,11 @@ fragment float4 starTunnelFragment(VertexOut in [[stage_in]],
         }
     }
 
-    // ===== Tone Mapping - Compression to displayable range =====
-    // Exponential compression: maps high intensity to visible color without blowout
-    col = 1.0 - exp(-col * 1.0);  // Reduced compression for brighter overall
+    // ===== Tone Mapping with EDR Headroom =====
+    // Exponential compression to SDR range, then boost bright areas into HDR
+    col = 1.0 - exp(-col * 1.0);
+    // EDR boost: bright pixels get amplified beyond SDR white for HDR displays
+    col *= 1.0 + col * 1.5;
 
     // ===== Black Hole Event Horizon =====
     if (bhR > 0.0) {
