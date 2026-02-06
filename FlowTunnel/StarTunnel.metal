@@ -7,6 +7,7 @@ struct StarUniforms {
     float stretch;
     float blur;
     float density;
+    float size;
     float2 resolution;
 };
 
@@ -38,65 +39,57 @@ fragment float4 starTunnelFragment(VertexOut in [[stage_in]],
 
     float t = uniforms.time * uniforms.speed;
 
-    // Number of depth layers based on density
     int numLayers = int(mix(10.0, 40.0, uniforms.density));
+    float threshold = mix(0.7, 0.5, uniforms.density);
+
+    // Star radius from size uniform, blur widens the glow
+    float baseRadius = uniforms.size * 0.06;
+    float glowWidth = mix(0.3, 2.0, uniforms.blur);
 
     float3 col = float3(0.0);
 
     for (int i = 0; i < numLayers; i++) {
-        // Depth for this layer, cycling forward with time
         float depth = fract(float(i) / float(numLayers) + t * 0.15);
-
-        // Scale factor — smaller depth = further away
         float scale = mix(20.0, 0.5, depth);
-
-        // Fade: dim when far, bright when close, fade out right at camera
         float fade = depth * smoothstep(0.0, 0.1, depth) * smoothstep(1.0, 0.8, depth);
 
-        // Grid coordinates at this depth
         float2 gridUV = uv * scale;
-        float2 cellID = floor(gridUV);
-        float2 cellUV = fract(gridUV) - 0.5;
+        float2 baseCell = floor(gridUV);
 
-        // Random value per cell to decide star presence and position
-        float rnd = hash21(cellID + float(i) * 134.51);
+        // Sample 3x3 neighborhood to eliminate cell-boundary clipping
+        for (int ox = -1; ox <= 1; ox++) {
+            for (int oy = -1; oy <= 1; oy++) {
+                float2 cellID = baseCell + float2(float(ox), float(oy));
+                float rnd = hash21(cellID + float(i) * 134.51);
 
-        // Only ~30-50% of cells have a star (adjusted by density)
-        float threshold = mix(0.7, 0.5, uniforms.density);
-        if (rnd > threshold) {
-            // Star position within cell (random offset)
-            float2 starPos = float2(hash21(cellID * 1.1 + float(i) * 73.0),
-                                     hash21(cellID * 2.3 + float(i) * 91.0)) - 0.5;
-            starPos *= 0.8; // Keep stars away from cell edges
+                if (rnd < threshold) continue;
 
-            float2 delta = cellUV - starPos;
+                // Star position within cell
+                float2 starPos = float2(hash21(cellID * 1.1 + float(i) * 73.0),
+                                         hash21(cellID * 2.3 + float(i) * 91.0)) - 0.5;
+                starPos *= 0.8;
 
-            // Apply radial stretch from screen center
-            if (uniforms.stretch > 0.0) {
-                // Direction from center in screen space
-                float2 worldPos = (cellID + cellUV + 0.5) / scale;
-                float2 radialDir = normalize(worldPos + 1e-6);
-                // Stretch along radial direction
-                float radialComponent = dot(delta, radialDir);
-                float tangentComponent = length(delta - radialComponent * radialDir);
-                float stretchFactor = 1.0 + uniforms.stretch * depth * 3.0;
-                float dist = sqrt(tangentComponent * tangentComponent +
-                                   (radialComponent / stretchFactor) * (radialComponent / stretchFactor));
-                float starSize = mix(0.01, 0.05, uniforms.blur);
-                float brightness = starSize / (dist + 0.001);
-                brightness = smoothstep(0.0, 1.0, brightness);
-                brightness *= fade;
+                // Delta from this fragment to the star center (in grid space)
+                float2 delta = gridUV - (cellID + 0.5 + starPos);
 
-                // Slight color variation
-                float3 starColor = mix(float3(0.8, 0.85, 1.0),
-                                        float3(0.6, 0.7, 1.0),
-                                        hash21(cellID + 42.0));
-                col += starColor * brightness;
-            } else {
-                float dist = length(delta);
-                float starSize = mix(0.01, 0.05, uniforms.blur);
-                float brightness = starSize / (dist + 0.001);
-                brightness = smoothstep(0.0, 1.0, brightness);
+                float dist;
+                if (uniforms.stretch > 0.0) {
+                    // Radial stretch from screen center
+                    float2 worldPos = (cellID + 0.5 + starPos) / scale;
+                    float radLen = length(worldPos);
+                    float2 radialDir = radLen > 1e-5 ? worldPos / radLen : float2(0.0, 1.0);
+                    float radialComponent = dot(delta, radialDir);
+                    float2 tangent = delta - radialComponent * radialDir;
+                    float tangentLen = length(tangent);
+                    float stretchFactor = 1.0 + uniforms.stretch * depth * 3.0;
+                    dist = sqrt(tangentLen * tangentLen +
+                                (radialComponent / stretchFactor) * (radialComponent / stretchFactor));
+                } else {
+                    dist = length(delta);
+                }
+
+                // Smooth falloff: Gaussian-ish glow centered on baseRadius
+                float brightness = exp(-dist * dist / (baseRadius * baseRadius * glowWidth));
                 brightness *= fade;
 
                 float3 starColor = mix(float3(0.8, 0.85, 1.0),
@@ -107,7 +100,7 @@ fragment float4 starTunnelFragment(VertexOut in [[stage_in]],
         }
     }
 
-    // Tone map to prevent blowout
+    // Tone map
     col = 1.0 - exp(-col * 1.5);
 
     return float4(col, 1.0);

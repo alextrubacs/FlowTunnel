@@ -7,6 +7,7 @@ struct StarUniforms {
     var stretch: Float = 0.5
     var blur: Float = 0.3
     var density: Float = 0.5
+    var size: Float = 1.0
     var resolution: SIMD2<Float> = .zero
 }
 
@@ -21,6 +22,7 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
     var stretch: Float = 0.5
     var blur: Float = 0.3
     var density: Float = 0.5
+    var size: Float = 1.0
 
     init?(mtkView: MTKView) {
         guard let device = mtkView.device ?? MTLCreateSystemDefaultDevice(),
@@ -83,6 +85,7 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
             stretch: stretch,
             blur: blur,
             density: density,
+            size: size,
             resolution: SIMD2<Float>(Float(view.drawableSize.width),
                                      Float(view.drawableSize.height))
         )
@@ -103,6 +106,7 @@ struct StarTunnelView: UIViewRepresentable {
     var stretch: Float
     var blur: Float
     var density: Float
+    var size: Float
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -122,6 +126,7 @@ struct StarTunnelView: UIViewRepresentable {
             renderer.stretch = stretch
             renderer.blur = blur
             renderer.density = density
+            renderer.size = size
             mtkView.delegate = renderer
             context.coordinator.renderer = renderer
         }
@@ -134,6 +139,7 @@ struct StarTunnelView: UIViewRepresentable {
         context.coordinator.renderer?.stretch = stretch
         context.coordinator.renderer?.blur = blur
         context.coordinator.renderer?.density = density
+        context.coordinator.renderer?.size = size
     }
 
     class Coordinator {
