@@ -9,11 +9,12 @@ struct ContentView: View {
     @State private var blackHoleRadius: Float = 0.15
     @State private var blackHoleWarp: Float = 1.0
     @State private var showControls = false
+    @State private var fps: Double = 0.0
 
     var body: some View {
         ZStack {
             StarTunnelView(speed: speed, stretch: stretch, blur: blur, density: density,
-                          size: size, blackHoleRadius: blackHoleRadius, blackHoleWarp: blackHoleWarp)
+                          size: size, blackHoleRadius: blackHoleRadius, blackHoleWarp: blackHoleWarp, fps: $fps)
                 .ignoresSafeArea()
 
             VStack {
@@ -27,6 +28,14 @@ struct ContentView: View {
 
             VStack {
                 HStack {
+                    // FPS counter
+                    Text(String(format: "%.0f FPS", fps))
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.white)
+                        .bold()
+                        .padding(8)
+                        .glassEffect(.clear, in: .capsule)
+
                     Spacer()
                     Button {
                         withAnimation(.spring) {
@@ -37,6 +46,8 @@ struct ContentView: View {
                     }
                     .buttonStyle(.glass)
                 }
+                .padding(.horizontal)
+                .padding(.top, 8)
                 Spacer()
             }
         }
