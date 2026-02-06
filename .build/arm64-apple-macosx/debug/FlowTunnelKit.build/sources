@@ -1,0 +1,11 @@
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarTunnelConfiguration.swift
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarTunnelError.swift
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarUniforms.swift
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/MetalStarTunnelRenderer.swift
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/ShaderLibrary.swift
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Platform/PlatformTypes.swift
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Platform/StarTunnelViewBridge.swift
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Platform/iOS/StarTunnelViewBridge+iOS.swift
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Platform/macOS/StarTunnelViewBridge+macOS.swift
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/StarTunnelView.swift
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/DerivedSources/resource_bundle_accessor.swift

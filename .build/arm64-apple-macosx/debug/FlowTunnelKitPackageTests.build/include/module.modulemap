@@ -1,0 +1,3 @@
+module FlowTunnelKitPackageTests {
+    header "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKitPackageTests.build/include/FlowTunnelKitPackageTests-Swift.h"
+}

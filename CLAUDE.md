@@ -1,31 +1,62 @@
 # FlowTunnel Project Guidelines
 
 ## Project Overview
-FlowTunnel is an iOS app featuring a procedural star tunnel effect with gravitational lensing around a black hole. All rendering is done via Metal fragment shader with real-time parameter control.
+FlowTunnel is now a **multi-platform Swift Package** (FlowTunnelKit) featuring a procedural star tunnel effect with gravitational lensing. The package provides a clean SwiftUI API for iOS 26+, macOS 13+, and visionOS 1+. All rendering is done via Metal fragment shader with real-time parameter control.
 
 ## Architecture
 
-### Directory Structure
+### Swift Package Structure
 ```
 FlowTunnel/
-├── FlowTunnel/
-│   ├── FlowTunnelApp.swift          # App entry point
-│   ├── Views/
-│   │   ├── ContentView.swift        # Main UI with parameter controls
-│   │   └── MetalStarTunnelView.swift # Metal renderer (GPU bridge)
-│   └── Shaders/
-│       └── StarTunnel.metal         # Fragment/vertex shaders
-├── FlowTunnel.xcodeproj/
-└── CLAUDE.md                        # This file
+├── Package.swift                    # Swift Package manifest
+├── Sources/FlowTunnelKit/
+│   ├── Core/                        # Platform-independent types
+│   │   ├── StarTunnelConfiguration.swift  # User configuration API
+│   │   ├── StarUniforms.swift            # GPU uniform struct
+│   │   └── StarTunnelError.swift         # Error types
+│   ├── Metal/                       # Metal rendering engine
+│   │   ├── MetalStarTunnelRenderer.swift # GPU pipeline & rendering
+│   │   └── ShaderLibrary.swift           # Shader loading from bundle
+│   ├── Platform/                    # Cross-platform bridges
+│   │   ├── PlatformTypes.swift           # UIKit/AppKit type aliases
+│   │   ├── StarTunnelViewBridge.swift    # Base bridge
+│   │   ├── iOS/StarTunnelViewBridge+iOS.swift
+│   │   └── macOS/StarTunnelViewBridge+macOS.swift
+│   ├── Resources/
+│   │   └── StarTunnel.metal         # Fragment/vertex shaders
+│   └── StarTunnelView.swift         # Public SwiftUI view
+├── Tests/FlowTunnelKitTests/        # Unit tests
+│   ├── ConfigurationTests.swift
+│   ├── UniformTests.swift
+│   ├── RendererTests.swift
+│   ├── ShaderLibraryTests.swift
+│   └── ErrorTests.swift
+├── Examples/FlowTunnelApp/          # Example iOS app
+│   ├── FlowTunnelApp.xcodeproj/
+│   └── FlowTunnelApp/
+│       ├── FlowTunnelApp.swift
+│       └── Views/ContentView.swift
+├── FlowTunnel/                      # Legacy app (kept for reference)
+└── README.md                        # Package documentation
 ```
 
 ### Key Files
 | File | Purpose | Language |
 |------|---------|----------|
-| `FlowTunnelApp.swift` | App initialization, dark mode, status bar hiding | Swift |
-| `ContentView.swift` | SwiftUI view with parameter sliders (Speed, Stretch, Blur, Density, Size, Black Hole, BH Warp) | Swift |
-| `MetalStarTunnelView.swift` | Metal renderer managing GPU pipeline, shader compilation, frame rendering | Swift |
-| `StarTunnel.metal` | Fullscreen shader: star field generation, gravitational lensing, event horizon | Metal |
+| **Package API** | | |
+| `StarTunnelView.swift` | Public SwiftUI view component | Swift |
+| `StarTunnelConfiguration.swift` | User-facing parameter struct | Swift |
+| `StarTunnelError.swift` | Error cases for initialization | Swift |
+| **Rendering** | | |
+| `MetalStarTunnelRenderer.swift` | Metal renderer managing GPU pipeline | Swift |
+| `ShaderLibrary.swift` | Loads shaders from Bundle.module | Swift |
+| `StarTunnel.metal` | Fragment shader (star field + lensing) | Metal |
+| `StarUniforms.swift` | GPU uniform struct (mirrors Metal) | Swift |
+| **Platform** | | |
+| `StarTunnelViewBridge+iOS.swift` | UIViewRepresentable bridge | Swift |
+| `StarTunnelViewBridge+macOS.swift` | NSViewRepresentable bridge | Swift |
+| **Example** | | |
+| `Examples/.../ContentView.swift` | Demo app with warp controls | Swift |
 
 ### Parameters
 All parameters are Float values with ranges:
@@ -159,15 +190,20 @@ When making changes to the project:
 
 ## Common Tasks
 
+### Using the Package in a New Project
+1. Add FlowTunnelKit as a Swift Package dependency
+2. Import `FlowTunnelKit` in your SwiftUI view
+3. Create a `@State var config = StarTunnelConfiguration()`
+4. Add `StarTunnelView(configuration: $config)` to your view
+5. Adjust parameters via `config.speed`, `config.blur`, etc.
+
 ### Adding a New Parameter
-1. Add to `StarUniforms` struct in both Metal and Swift (maintain order)
-2. Add property to `MetalStarTunnelRenderer`
-3. Add to `StarUniforms` init in `draw(in:)` method
-4. Add to `StarTunnelView` parameter
-5. Wire through `makeUIView()` and `updateUIView()`
-6. Add `@State` to `ContentView`
-7. Add slider in `controlsPanel`
-8. Build and test
+1. Add to `StarTunnelConfiguration` struct in `Core/`
+2. Add to `StarUniforms` struct (both Swift and Metal, maintain order)
+3. Update `StarUniforms.init(config:time:resolution:enableEDR:)`
+4. Update shader code in `StarTunnel.metal` to use new parameter
+5. Run `swift test` to verify
+6. Update README.md parameter documentation
 
 ### Modifying Shader Algorithm
 1. Read `StarTunnel.metal` to understand current flow
@@ -190,6 +226,14 @@ When making changes to the project:
 - 60 FPS target on device maintained
 
 ## Build Settings
+
+### Package
+- **Platforms**: iOS 26.0+, macOS 13.0+, visionOS 1.0+
+- **Swift Version**: 6.0
+- **Swift Concurrency**: Strict concurrency enabled
+- **Resources**: StarTunnel.metal processed via Bundle.module
+
+### Example App
 - **Deployment Target**: iOS 26.2
 - **Swift Version**: 6.0
 - **Swift Concurrency**: Strict (SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor)
@@ -197,7 +241,33 @@ When making changes to the project:
 - **Team ID**: H2WYXEJN79
 - **Bundle ID**: com.alextrubacs.FlowTunnel
 
+## Development Workflow
+
+### Building the Package
+```bash
+swift build          # Build for current platform
+swift test           # Run all tests (17 tests across 5 suites)
+```
+
+### Running the Example App
+```bash
+cd Examples/FlowTunnelApp
+open FlowTunnelApp.xcodeproj
+# Build and run on simulator or device
+```
+
+### Testing on Different Platforms
+- **iOS**: Run example app on iPhone/iPad simulator or device
+- **macOS**: Package builds natively, create macOS target app as needed
+- **visionOS**: Package supports visionOS 1.0+, untested (requires visionOS SDK)
+
 ---
 
 **Last Updated**: 2026-02-06
-**Session**: Documentation pass + Xcode MCP guidelines added
+**Session**: Multi-platform Swift Package migration completed
+- Created FlowTunnelKit Swift Package with iOS 26+, macOS 13+, visionOS 1+ support
+- Extracted platform-independent types (Configuration, Uniforms, Errors)
+- Implemented cross-platform view bridges (iOS/macOS)
+- Added comprehensive test suite (17 tests, all passing)
+- Created example app demonstrating package usage
+- Documented package structure and API in README.md
