@@ -16,6 +16,7 @@ struct StarUniforms {
     float2 resolution;       ///< Screen dimensions in pixels
     float blackHoleRadius;   ///< Event horizon radius in normalized UV space (0 = disabled)
     float blackHoleWarp;     ///< Lensing strength multiplier (0-3, controls deflection intensity)
+    float enableEDR;         ///< 1.0 if EDR/HDR output is available, 0.0 for SDR displays
 };
 
 /// Output structure for vertex shader
@@ -149,9 +150,14 @@ fragment float4 starTunnelFragment(VertexOut in [[stage_in]],
         }
     }
 
-    // ===== Tone Mapping - Compression to displayable range =====
-    // Exponential compression: maps high intensity to visible color without blowout
-    col = 1.0 - exp(-col * 1.0);  // Reduced compression for brighter overall
+    // ===== Tone Mapping with Optional EDR Headroom =====
+    // Exponential compression to SDR range
+    col = 1.0 - exp(-col * 1.0);
+    // EDR boost: only apply on HDR-capable displays to avoid clamping on SDR
+    if (uniforms.enableEDR > 0.5) {
+        // Bright pixels get amplified beyond SDR white for HDR displays
+        col *= 1.0 + col * 1.5;
+    }
 
     // ===== Black Hole Event Horizon =====
     if (bhR > 0.0) {
