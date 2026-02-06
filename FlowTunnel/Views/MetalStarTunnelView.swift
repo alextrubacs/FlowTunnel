@@ -15,14 +15,36 @@ struct StarUniforms {
     var blackHoleWarp: Float = 1.0
 }
 
-/// Metal Renderer - Manages GPU rendering pipeline and frame updates
+/// Metal Renderer - GPU rendering engine for the star tunnel effect
+///
+/// How it works:
+/// 1. **One-time setup** (init):
+///    - Gets a GPU device from the system
+///    - Loads the Metal shader code and compiles it
+///    - Creates a command queue (a pipeline for sending GPU commands)
+///    - Builds a fullscreen quad (2 triangles) to render on
+///
+/// 2. **Each frame** (draw):
+///    - Gets the current screen drawable from MTKView
+///    - Packages up all parameter values (speed, blur, etc.) into a buffer
+///    - Sends render commands to the GPU:
+///      * Use the compiled shaders
+///      * Set up the vertex buffer (the quad)
+///      * Pass the parameters to the fragment shader
+///      * Draw the fullscreen quad
+///    - Presents the rendered image to the screen
+///
+/// The renderer acts as the bridge between SwiftUI (which sends parameter values)
+/// and the GPU (which does the actual star tunnel rendering in the shader).
 class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
-    private let device: MTLDevice
-    private let commandQueue: MTLCommandQueue
-    private let pipelineState: MTLRenderPipelineState
-    private let vertexBuffer: MTLBuffer
-    private var startTime: CFAbsoluteTime
+    // GPU infrastructure
+    private let device: MTLDevice                // The GPU
+    private let commandQueue: MTLCommandQueue    // Queue for GPU commands
+    private let pipelineState: MTLRenderPipelineState  // Compiled shader program
+    private let vertexBuffer: MTLBuffer          // Fullscreen quad vertices
+    private var startTime: CFAbsoluteTime        // When rendering started
 
+    // Animatable parameters synced from SwiftUI
     var speed: Float = 1.0
     var stretch: Float = 0.5
     var blur: Float = 0.3
@@ -32,7 +54,12 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
     var blackHoleWarp: Float = 1.0
 
     /// Initialize Metal device, compile shaders, and create render pipeline
+    /// - Gets or creates a GPU device
+    /// - Loads Metal shaders from the default library (compiled shader code)
+    /// - Creates a render pipeline (vertex shader → rasterizer → fragment shader)
+    /// - Allocates a fullscreen quad to render onto
     init?(mtkView: MTKView) {
+        // Get GPU device or fail gracefully
         guard let device = mtkView.device ?? MTLCreateSystemDefaultDevice(),
               let commandQueue = device.makeCommandQueue() else {
             return nil
@@ -43,11 +70,12 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
         self.startTime = CFAbsoluteTimeGetCurrent()
         mtkView.device = device
 
-        // Fullscreen quad vertices
+        // Create fullscreen quad vertices (2 triangles covering entire screen)
         let vertices: [SIMD2<Float>] = [
-            SIMD2(-1, -1), SIMD2( 1, -1), SIMD2(-1,  1),
-            SIMD2(-1,  1), SIMD2( 1, -1), SIMD2( 1,  1)
+            SIMD2(-1, -1), SIMD2( 1, -1), SIMD2(-1,  1),  // Triangle 1
+            SIMD2(-1,  1), SIMD2( 1, -1), SIMD2( 1,  1)   // Triangle 2
         ]
+        // Allocate GPU memory for vertices
         guard let vb = device.makeBuffer(bytes: vertices,
                                          length: MemoryLayout<SIMD2<Float>>.stride * vertices.count,
                                          options: .storageModeShared) else {
@@ -55,19 +83,21 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
         }
         self.vertexBuffer = vb
 
-        // Load and compile Metal shaders
+        // Load and compile Metal shaders from StarTunnel.metal
         guard let library = device.makeDefaultLibrary(),
               let vertexFunc = library.makeFunction(name: "starTunnelVertex"),
               let fragFunc = library.makeFunction(name: "starTunnelFragment") else {
             return nil
         }
 
+        // Create render pipeline: specify which shaders to use
         let descriptor = MTLRenderPipelineDescriptor()
-        descriptor.vertexFunction = vertexFunc
-        descriptor.fragmentFunction = fragFunc
-        descriptor.colorAttachments[0].pixelFormat = mtkView.colorPixelFormat
+        descriptor.vertexFunction = vertexFunc           // Positions vertices on screen
+        descriptor.fragmentFunction = fragFunc           // Colors each pixel
+        descriptor.colorAttachments[0].pixelFormat = mtkView.colorPixelFormat  // Output format
 
         do {
+            // Compile the pipeline into GPU code
             pipelineState = try device.makeRenderPipelineState(descriptor: descriptor)
         } catch {
             print("Failed to create pipeline state: \(error)")
@@ -77,38 +107,57 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
         super.init()
     }
 
+    /// Called when screen size changes (e.g., device rotation)
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {}
 
+    /// Called every frame to render one image
+    /// - Packs current parameters into a buffer
+    /// - Sends GPU render commands
+    /// - Presents the result to screen
     func draw(in view: MTKView) {
-        guard let drawable = view.currentDrawable,
-              let descriptor = view.currentRenderPassDescriptor,
-              let commandBuffer = commandQueue.makeCommandBuffer(),
-              let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor) else {
+        // Get GPU rendering surfaces from MTKView
+        guard let drawable = view.currentDrawable,              // Where to draw
+              let descriptor = view.currentRenderPassDescriptor, // How to clear
+              let commandBuffer = commandQueue.makeCommandBuffer(),  // GPU command container
+              let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor) else {  // GPU command writer
             return
         }
 
+        // Calculate elapsed time for animation
         let elapsed = Float(CFAbsoluteTimeGetCurrent() - startTime)
+
+        // Package all shader parameters into a single buffer
         var uniforms = StarUniforms(
-            time: elapsed,
-            speed: speed,
-            stretch: stretch,
-            blur: blur,
-            density: density,
-            size: size,
+            time: elapsed,                  // How far through animation we are
+            speed: speed,                   // How fast stars move
+            stretch: stretch,               // How elongated stars are
+            blur: blur,                     // How soft/glowy stars are
+            density: density,               // How many stars
+            size: size,                     // How big stars are
             resolution: SIMD2<Float>(Float(view.drawableSize.width),
-                                     Float(view.drawableSize.height)),
-            blackHoleRadius: blackHoleRadius,
-            blackHoleWarp: blackHoleWarp
+                                     Float(view.drawableSize.height)),  // Screen size
+            blackHoleRadius: blackHoleRadius,  // Size of black hole
+            blackHoleWarp: blackHoleWarp       // Strength of light bending
         )
 
+        // Tell GPU which compiled shader program to use
         encoder.setRenderPipelineState(pipelineState)
+
+        // Tell GPU where the quad vertices are
         encoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
+
+        // Send parameter values to the fragment shader (runs per pixel)
         encoder.setFragmentBytes(&uniforms, length: MemoryLayout<StarUniforms>.size, index: 0)
+
+        // Render: draw the fullscreen quad (6 vertices = 2 triangles)
         encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
+
+        // Finish encoding render commands
         encoder.endEncoding()
 
-        commandBuffer.present(drawable)
-        commandBuffer.commit()
+        // Submit commands to GPU and display the result
+        commandBuffer.present(drawable)  // "Show this on screen"
+        commandBuffer.commit()            // "Execute these GPU commands"
     }
 }
 
