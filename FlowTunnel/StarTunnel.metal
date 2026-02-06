@@ -9,6 +9,7 @@ struct StarUniforms {
     float density;
     float size;
     float2 resolution;
+    float blackHoleRadius;
 };
 
 struct VertexOut {
@@ -36,6 +37,16 @@ fragment float4 starTunnelFragment(VertexOut in [[stage_in]],
                                     constant StarUniforms &uniforms [[buffer(0)]]) {
     float2 fragCoord = in.uv * uniforms.resolution;
     float2 uv = (fragCoord - 0.5 * uniforms.resolution) / uniforms.resolution.y;
+
+    // Save pre-distortion UV for event horizon + glow compositing
+    float2 uv_original = uv;
+    float bhR = uniforms.blackHoleRadius;
+    if (bhR > 0.0) {
+        float r = length(uv);
+        // Schwarzschild-inspired lensing: displacement ~ R²/r²
+        float deflection = (bhR * bhR) / (r * r + 0.001);
+        uv = uv * (1.0 + deflection);
+    }
 
     float t = uniforms.time * uniforms.speed;
 
@@ -102,6 +113,14 @@ fragment float4 starTunnelFragment(VertexOut in [[stage_in]],
 
     // Tone map
     col = 1.0 - exp(-col * 1.5);
+
+    // Black hole: event horizon (black disk)
+    if (bhR > 0.0) {
+        float r_orig = length(uv_original);
+        float edgeSoftness = 0.003;
+        float horizonMask = smoothstep(bhR - edgeSoftness, bhR + edgeSoftness, r_orig);
+        col *= horizonMask;
+    }
 
     return float4(col, 1.0);
 }

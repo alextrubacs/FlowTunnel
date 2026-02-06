@@ -9,6 +9,7 @@ struct StarUniforms {
     var density: Float = 0.5
     var size: Float = 1.0
     var resolution: SIMD2<Float> = .zero
+    var blackHoleRadius: Float = 0.15
 }
 
 class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
@@ -23,6 +24,7 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
     var blur: Float = 0.3
     var density: Float = 0.5
     var size: Float = 1.0
+    var blackHoleRadius: Float = 0.15
 
     init?(mtkView: MTKView) {
         guard let device = mtkView.device ?? MTLCreateSystemDefaultDevice(),
@@ -87,7 +89,8 @@ class MetalStarTunnelRenderer: NSObject, MTKViewDelegate {
             density: density,
             size: size,
             resolution: SIMD2<Float>(Float(view.drawableSize.width),
-                                     Float(view.drawableSize.height))
+                                     Float(view.drawableSize.height)),
+            blackHoleRadius: blackHoleRadius
         )
 
         encoder.setRenderPipelineState(pipelineState)
@@ -107,6 +110,7 @@ struct StarTunnelView: UIViewRepresentable {
     var blur: Float
     var density: Float
     var size: Float
+    var blackHoleRadius: Float
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -127,6 +131,7 @@ struct StarTunnelView: UIViewRepresentable {
             renderer.blur = blur
             renderer.density = density
             renderer.size = size
+            renderer.blackHoleRadius = blackHoleRadius
             mtkView.delegate = renderer
             context.coordinator.renderer = renderer
         }
@@ -140,6 +145,7 @@ struct StarTunnelView: UIViewRepresentable {
         context.coordinator.renderer?.blur = blur
         context.coordinator.renderer?.density = density
         context.coordinator.renderer?.size = size
+        context.coordinator.renderer?.blackHoleRadius = blackHoleRadius
     }
 
     class Coordinator {

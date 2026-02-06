@@ -6,11 +6,12 @@ struct ContentView: View {
     @State private var blur: Float = 0.3
     @State private var density: Float = 0.5
     @State private var size: Float = 1.0
+    @State private var blackHoleRadius: Float = 0.15
     @State private var showControls = true
 
     var body: some View {
         ZStack {
-            StarTunnelView(speed: speed, stretch: stretch, blur: blur, density: density, size: size)
+            StarTunnelView(speed: speed, stretch: stretch, blur: blur, density: density, size: size, blackHoleRadius: blackHoleRadius)
                 .ignoresSafeArea()
 
             VStack {
@@ -50,6 +51,7 @@ struct ContentView: View {
             parameterSlider(label: "Blur", value: $blur, range: 0...1)
             parameterSlider(label: "Density", value: $density, range: 0.1...1)
             parameterSlider(label: "Size", value: $size, range: 0.1...3)
+            parameterSlider(label: "Black Hole", value: $blackHoleRadius, range: 0...0.5)
         }
         .padding(20)
         .background(.ultraThinMaterial.opacity(0.8))
