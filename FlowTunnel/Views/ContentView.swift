@@ -16,6 +16,7 @@ struct ContentView: View {
     @State private var isWarpPressed = false
     @State private var warpProgress: Float = 0.0
     @State private var warpTask: Task<Void, Never>? = nil
+    @State private var lastWarpUpdateTime: CFAbsoluteTime = 0
 
     // Snapshot of user slider values before warp
     @State private var preWarpSpeed: Float = 1.0
@@ -90,25 +91,32 @@ struct ContentView: View {
     // MARK: - Warp Button
 
     private var warpButton: some View {
-        Text(isWarpPressed || warpProgress > 0 ? "WARPING" : "WARP SPEED")
-            .font(.subheadline.weight(.bold))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 24)
-            .padding(.vertical, 12)
-            .glassEffect(.clear, in: .capsule)
-            .scaleEffect(isWarpPressed ? 0.95 : 1.0)
-            .animation(.easeInOut(duration: 0.15), value: isWarpPressed)
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in
-                        if !isWarpPressed {
-                            onWarpPressed()
-                        }
+        Button(action: {}) {
+            Text(isWarpPressed || warpProgress > 0 ? "WARPING" : "WARP SPEED")
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(.clear)
+        }
+        .buttonStyle(.plain)
+        .glassEffect(.clear, in: .capsule)
+        .scaleEffect(isWarpPressed ? 0.95 : 1.0)
+        .animation(.easeInOut(duration: 0.15), value: isWarpPressed)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    if !isWarpPressed {
+                        onWarpPressed()
                     }
-                    .onEnded { _ in
-                        onWarpReleased()
-                    }
-            )
+                }
+                .onEnded { _ in
+                    onWarpReleased()
+                }
+        )
+        .accessibilityLabel("Warp Speed")
+        .accessibilityHint("Press and hold to activate warp speed mode")
+        .accessibilityValue(isWarpPressed || warpProgress > 0 ? "Warping" : "Ready")
     }
 
     // MARK: - Controls Panel
@@ -175,6 +183,7 @@ struct ContentView: View {
 
     private func startWarpLoop() {
         warpTask?.cancel()
+        lastWarpUpdateTime = CFAbsoluteTimeGetCurrent()
         warpTask = Task { @MainActor in
             let tickInterval: UInt64 = 16_000_000 // ~60Hz (16ms)
 
@@ -192,7 +201,9 @@ struct ContentView: View {
     }
 
     private func updateWarpProgress() {
-        let dt: Float = 1.0 / 60.0
+        let now = CFAbsoluteTimeGetCurrent()
+        let dt = Float(now - lastWarpUpdateTime)
+        lastWarpUpdateTime = now
 
         if isWarpPressed {
             warpProgress = min(1.0, warpProgress + dt / rampUpDuration)
