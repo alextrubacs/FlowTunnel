@@ -23,6 +23,13 @@
     "swift-dependencies": "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/StarUniforms.swiftdeps",
     "diagnostics": "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/StarUniforms.dia"
   },
+  "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/EmbeddedShaderSource.swift": {
+    "dependencies": "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/EmbeddedShaderSource.d",
+    "object": "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/EmbeddedShaderSource.swift.o",
+    "swiftmodule": "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/EmbeddedShaderSource~partial.swiftmodule",
+    "swift-dependencies": "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/EmbeddedShaderSource.swiftdeps",
+    "diagnostics": "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/EmbeddedShaderSource.dia"
+  },
   "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/MetalStarTunnelRenderer.swift": {
     "dependencies": "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/MetalStarTunnelRenderer.d",
     "object": "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/MetalStarTunnelRenderer.swift.o",

@@ -349,7 +349,7 @@
 /* Begin XCLocalSwiftPackageReference section */
 		C9D6E4C22F3676F90086CA08 /* XCLocalSwiftPackageReference "../../../FlowTunnel" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../FlowTunnel;
+			relativePath = ../..;
 		};
 /* End XCLocalSwiftPackageReference section */
 

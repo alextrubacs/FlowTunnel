@@ -17,14 +17,8 @@ public final class ShaderLibrary: @unchecked Sendable {
     public init(device: MTLDevice) throws {
         self.device = device
 
-        // Load shader source from package bundle
-        guard let shaderURL = Bundle.module.url(forResource: "StarTunnel", withExtension: "metal") else {
-            throw StarTunnelError.shaderLibraryNotFound
-        }
-
-        guard let shaderSource = try? String(contentsOf: shaderURL, encoding: .utf8) else {
-            throw StarTunnelError.shaderLibraryNotFound
-        }
+        // Use embedded shader source (avoids SPM resource bundle issues)
+        let shaderSource = EmbeddedShaderSource.starTunnelShader
 
         // Compile shader source into Metal library
         do {

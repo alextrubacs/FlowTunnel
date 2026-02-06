@@ -53,6 +53,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/EmbeddedShaderSource.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/MetalStarTunnelRenderer.swift"
         },
         {
@@ -103,6 +107,7 @@
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/StarTunnelConfiguration.swift.o",
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/StarTunnelError.swift.o",
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/StarUniforms.swift.o",
+        "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/EmbeddedShaderSource.swift.o",
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/MetalStarTunnelRenderer.swift.o",
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/ShaderLibrary.swift.o",
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/PlatformTypes.swift.o",
@@ -185,6 +190,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/EmbeddedShaderSource.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/MetalStarTunnelRenderer.swift.o"
         },
         {
@@ -225,6 +234,7 @@
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarTunnelConfiguration.swift",
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarTunnelError.swift",
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarUniforms.swift",
+        "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/EmbeddedShaderSource.swift",
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/MetalStarTunnelRenderer.swift",
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/ShaderLibrary.swift",
         "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Platform/PlatformTypes.swift",
@@ -495,6 +505,7 @@
       "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarTunnelConfiguration.swift",
       "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarTunnelError.swift",
       "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarUniforms.swift",
+      "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/EmbeddedShaderSource.swift",
       "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/MetalStarTunnelRenderer.swift",
       "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/ShaderLibrary.swift",
       "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Platform/PlatformTypes.swift",
@@ -756,6 +767,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/EmbeddedShaderSource.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/MetalStarTunnelRenderer.swift"
         },
         {
@@ -809,6 +824,10 @@
         {
           "kind" : "virtual",
           "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/alex.trubacs/Developer/Projects/FlowTunnel/.build/arm64-apple-macosx/debug/FlowTunnelKit.build/EmbeddedShaderSource.swift.o"
         },
         {
           "kind" : "file",

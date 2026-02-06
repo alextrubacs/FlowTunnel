@@ -1,6 +1,7 @@
 /Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarTunnelConfiguration.swift
 /Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarTunnelError.swift
 /Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Core/StarUniforms.swift
+/Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/EmbeddedShaderSource.swift
 /Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/MetalStarTunnelRenderer.swift
 /Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Metal/ShaderLibrary.swift
 /Users/alex.trubacs/Developer/Projects/FlowTunnel/Sources/FlowTunnelKit/Platform/PlatformTypes.swift
